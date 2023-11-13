@@ -1,0 +1,160 @@
+<!DOCTYPE html> 
+<html>
+<head>
+    <title>PetAI</title>
+    <style>
+        /* Styles as before */
+        .logo {
+            width: 100px;
+            height: auto;
+        }
+
+      
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+        }
+
+        button {
+            background-color: #bf00ff;
+            color: white;
+            padding: 16px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        .custom-font {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+        } 
+        select {
+            font-family: "custom font for selector", Arial, sans-serif;
+            font-size: 20px;
+        }
+        .centered-container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh
+        }
+
+        .button-container {
+            position: relative;
+            height: 200px;
+        }
+
+        button {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(to right, #67125c, #af5eaa);
+            border-radius: 1px;
+            box-shadow: 0px 0px 5px rgba(0,0,0,5);
+            font-family: "custom font for selector", Arial, sans-serif;
+            font-size: 20px;
+        }
+        label {
+            font-family: "custom font for selector", Arial, sans-serif;
+            font-size: 20px;
+        }
+        select option {
+            font-family: "custom font for option", Arial, sans-serif;
+            font-size: 20px;
+        }
+        textarea {
+            font-family: "custom font for option", Arial, sans-serif;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+      
+        <h1><img src="pets-a.svg" class="logo" > Pet Name Generator <img src="pets-a.svg" class="logo"></h1>
+    </header>
+
+    <label for="Music Selection">Enter Title and Artist: ex. Dear Prudence by the Beatles    </label>
+    <textarea id="MusicSelection"
+        rows="1" cols="40" placeholder="Enter you title and artist here ex. Dear Prudence by the Beatles">
+    </textarea>
+    
+    <br>
+    <label for="responseField">Pet Names:</label>
+    <textarea id="responseField" rows="12" cols="100" readonly></textarea>
+    <br>
+    <div class="button-container">
+    <button id="Fido"
+        onclick="callLambdaFunction()">Fetch Pet Name</button>
+    </div>
+    <br>
+    
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1470.0.min.js"></script>
+    
+
+    <script> 
+        // Configure Amazon Cognito Identity Pool
+        var identityPoolId = 'us-east-1:64676074-a8a8-4f28-bf32-8a17229b20b7'; // Replace with your Identity Pool ID
+        AWS.config.region = 'us-east-1'; // Replace with your AWS region
+    
+        // Initialize Amazon Cognito Identity
+        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+            IdentityPoolId: 'us-east-1:64676074-a8a8-4f28-bf32-8a17229b20b7'
+        });
+
+        
+
+        
+        // Create an AWS service object
+        var lambda = new AWS.Lambda();
+        console.log(lambda.config.credentials)
+    
+        function callLambdaFunction() {
+            //Clear response field in between requests
+            document.getElementById("responseField").value = "";
+
+            var inputText = document.getElementById("MusicSelection").value;
+            var button = document.getElementById("Fido");
+            button.textContent = "Fetching ...."
+            
+            var responseField = document.getElementById("responseField");
+            
+    
+            // Prepare the request data
+            var requestData = {
+                FunctionName: 'testaiapp-TestAIFunction-mNVYy5GYcJuC', // Replace with your Lambda function name
+                InvocationType: 'RequestResponse', // Adjust as needed
+                Payload: JSON.stringify({ data: inputText })
+            };
+    
+            // Invoke the Lambda function
+
+            lambda.invoke(requestData, function (err, data) {
+                if (err) {
+                    responseField.value = "Error calling Lambda function: " + err.message;
+                } else {
+                    
+                    //format the response to pull the data -  No error checkin incorporated here 
+                    var responseBody = JSON.parse(data.Payload);
+                    var dataValue = JSON.parse(responseBody.body).data;
+                    console.log("value ", dataValue);
+                    console.log('Lambda Function response:', data);
+
+                    //reset the button text
+                    button.textContent = ("Fetch Pet Name");
+                    
+                    responseField.value = dataValue;
+                    
+                }
+            });
+        }
+
+
+        
+        
+    </script>
+    
+</body>
+</html>
+

@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  TestAI
+
+  Sample SAM Template for TestAI
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 60
+Resources:
+  TestAIFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: TestAI/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+      - x86_64
+      Policies:
+      # Give the Lambda service to DynamoDB PutItem and invoke bedrock models -  
+      - Statement:
+        - Sid: DynamoDBUpdatePetTracker
+          Effect: Allow
+          Action:
+          - dynamodb:PutItem
+          Resource: '*'
+      - Statement:
+        - Sid: BedrockInvoker
+          Effect: Allow
+          Action:
+          - bedrock:InvokeModel
+          Resource: '*'  
+  PetTracker:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions:
+        - 
+          AttributeName: "Model-Id"
+          AttributeType: "S"
+        - 
+          AttributeName: "DT"
+          AttributeType: "S"
+      DeletionProtectionEnabled: False
+      KeySchema: 
+        - 
+          AttributeName: "Model-Id"
+          KeyType: "HASH"
+        - 
+          AttributeName: "DT"
+          KeyType: "RANGE"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: PetTracker  
+Outputs:
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  TestAIFunction:
+    Description: TestAI Lambda Function ARN
+    Value: !GetAtt TestAIFunction.Arn
+  TestAIFunctionIamRole:
+    Description: Implicit IAM Role created for TestAI function
+    Value: !GetAtt TestAIFunctionRole.Arn
+ 
