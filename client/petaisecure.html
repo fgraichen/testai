@@ -3,13 +3,31 @@
 <head>
     <title>PetAI</title>
     <style>
+        html, body {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
         /* Styles as before */
         .logo {
             width: 100px;
             height: auto;
         }
 
-      
+        .centered-wrapper {
+    position: relative;
+    text-align: center;
+}
+.centered-wrapper:before {
+    content: "";
+    position: relative;
+    width: 0; height: 100%;
+    vertical-align: middle;
+}
+.centered-content {
+    vertical-align: middle
+}
 
         header {
             text-align: center;
@@ -38,7 +56,11 @@
             align-items: center;
             height: 100vh
         }
-
+        .centered-result{
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }         
         .button-container {
             position: relative;
             height: 200px;
@@ -69,7 +91,8 @@
         }
     </style>
 </head>
-<body>
+<body class="centered-wrapper">
+    <div class="centered-content">
     <header>
       
         <h1><img src="pets-a.svg" class="logo" > Pet Name Generator <img src="pets-a.svg" class="logo"></h1>
@@ -77,16 +100,19 @@
 
     <label for="Music Selection">Enter Title and Artist: ex. Dear Prudence by the Beatles    </label>
     <textarea id="MusicSelection"
-        rows="1" cols="40" placeholder="Enter you title and artist here ex. Dear Prudence by the Beatles">
+        rows="1" cols="40" placeholder="Enter you title and artist here ex. Dear Prudence by the Beatles   ">
     </textarea>
     
     <br>
+    <div class=".centered-result">
     <label for="responseField">Pet Names:</label>
-    <textarea id="responseField" rows="12" cols="100" readonly></textarea>
+    <textarea id="responseField" rows="14" cols="100" readonly></textarea>
     <br>
+    </div>
     <div class="button-container">
     <button id="Fido"
         onclick="callLambdaFunction()">Fetch Pet Name</button>
+    </div>
     </div>
     <br>
     
@@ -95,12 +121,12 @@
 
     <script> 
         // Configure Amazon Cognito Identity Pool
-        var identityPoolId = 'us-east-1:64676074-a8a8-4f28-bf32-8a17229b20b7'; // Replace with your Identity Pool ID
+        var identityPoolId = 'us-east-1:64676074-a8a8-4f28-######'; // Replace with your Identity Pool ID
         AWS.config.region = 'us-east-1'; // Replace with your AWS region
     
         // Initialize Amazon Cognito Identity
         AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: 'us-east-1:64676074-a8a8-4f28-bf32-8a17229b20b7'
+            IdentityPoolId: 'us-east-1:64676074-a8a8-4f28-#########'
         });
 
         
@@ -123,7 +149,7 @@
     
             // Prepare the request data
             var requestData = {
-                FunctionName: 'testaiapp-TestAIFunction-mNVYy5GYcJuC', // Replace with your Lambda function name
+                FunctionName: 'petai-PetAIFunction-#######', // Replace with your Lambda function name
                 InvocationType: 'RequestResponse', // Adjust as needed
                 Payload: JSON.stringify({ data: inputText })
             };
